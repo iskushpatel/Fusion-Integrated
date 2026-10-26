@@ -24,6 +24,7 @@ export interface LeaveRequest {
   days: number;
   reason: string;
   user_id: number;
+  employee_name: string;
   status: "pending" | "approved" | "rejected" | "cancelled";
   review_note: string;
   created_at: string;

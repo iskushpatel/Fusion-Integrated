@@ -15,6 +15,10 @@ class LeaveType(TimeStampedModel):
     class Meta:
         db_table = "leave_type"
         ordering = ["name"]
+        constraints = [
+            models.CheckConstraint(condition=Q(annual_allowance__gte=0),
+                                   name="leave_type_allowance_nonnegative"),
+        ]
 
 
 class LeaveBalance(TimeStampedModel):
@@ -32,6 +36,25 @@ class LeaveBalance(TimeStampedModel):
                                     name="leave_balance_user_type_year_uniq"),
             models.CheckConstraint(condition=Q(allocated_days__gte=0)
                                    & Q(carried_days__gte=0), name="leave_balance_nonnegative"),
+        ]
+
+
+class LeaveManagerAssignment(TimeStampedModel):
+    """Explicit reporting scope until an HR employment contract is available."""
+
+    manager_user_id = models.IntegerField(db_index=True)
+    employee_user_id = models.IntegerField(db_index=True)
+    assigned_by_user_id = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = "leave_manager_assignment"
+        constraints = [
+            models.UniqueConstraint(fields=["manager_user_id", "employee_user_id"],
+                                    name="leave_manager_employee_uniq"),
+            models.CheckConstraint(
+                condition=~Q(manager_user_id=models.F("employee_user_id")),
+                name="leave_manager_not_self",
+            ),
         ]
 
 

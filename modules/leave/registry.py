@@ -19,6 +19,7 @@ PERMISSIONS = [
     ("leave.request.cancel", "Cancel own pending leave requests"),
     ("leave.request.view", "View leave requests for managed employees"),
     ("leave.request.review", "Approve or reject leave requests"),
+    ("leave.configuration.manage", "Configure leave policy and balances"),
 ]
 
 SYSTEM_PERMISSIONS = []
@@ -33,5 +34,5 @@ ROLE_GRANTS = {
     "placement_officer": _MANAGER,
     "placement_chairman": _MANAGER,
     "Dean Academic": _MANAGER,
-    "acadadmin": _MANAGER,
+    "acadadmin": [*_MANAGER, "leave.configuration.manage"],
 }

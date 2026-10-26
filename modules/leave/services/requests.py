@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.utils import timezone
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 
 from modules.leave.domain.rules import LeaveRuleError, validate_request
 from modules.leave.models import LeaveBalance, LeaveRequest, LeaveType
@@ -30,13 +30,33 @@ def create_request(*, user_id, leave_type_id, start_date, end_date, reason):
 
 
 @transaction.atomic
-def review_request(*, leave_request, actor_id, decision, note=""):
-    if leave_request.status != "pending":
+def review_request(*, leave_request, actor_id, decision, scope, note=""):
+    if decision not in {"approved", "rejected"}:
+        raise ValidationError({"decision": "Choose approved or rejected."})
+    row = scope.select_for_update().filter(pk=leave_request.pk).first()
+    if row is None:
+        raise NotFound("No such leave request.")
+    if row.user_id == actor_id:
+        raise ValidationError({"status": "You cannot review your own leave request."})
+    if row.status != "pending":
         raise ValidationError({"status": "Only pending requests can be reviewed."})
-    leave_request.status = decision
-    leave_request.reviewed_by_user_id = actor_id
-    leave_request.reviewed_at = timezone.now()
-    leave_request.review_note = note.strip()
-    leave_request.save(update_fields=["status", "reviewed_by_user_id", "reviewed_at",
-                                      "review_note", "updated_at"])
-    return leave_request
+    row.status = decision
+    row.reviewed_by_user_id = actor_id
+    row.reviewed_at = timezone.now()
+    row.review_note = note.strip()
+    row.save(update_fields=["status", "reviewed_by_user_id", "reviewed_at",
+                            "review_note", "updated_at"])
+    return row
+
+
+@transaction.atomic
+def cancel_request(*, leave_request_id, user_id):
+    row = (LeaveRequest.objects.select_for_update()
+           .filter(pk=leave_request_id, user_id=user_id).first())
+    if row is None:
+        raise NotFound("No such leave request.")
+    if row.status != "pending":
+        raise ValidationError({"status": "Only pending requests can be cancelled."})
+    row.status = "cancelled"
+    row.save(update_fields=["status", "updated_at"])
+    return row

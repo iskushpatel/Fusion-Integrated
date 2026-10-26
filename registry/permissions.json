@@ -44,6 +44,7 @@
           "leave.request.view_self"
         ],
         "acadadmin": [
+          "leave.configuration.manage",
           "leave.request.cancel",
           "leave.request.create",
           "leave.request.review",
@@ -117,6 +118,10 @@
         {
           "code": "leave.request.review",
           "label": "Approve or reject leave requests"
+        },
+        {
+          "code": "leave.configuration.manage",
+          "label": "Configure leave policy and balances"
         }
       ],
       "scope_permissions": [],

@@ -22,6 +22,7 @@ For the intended taxonomy of modules not yet built, see
 | `leave.request.cancel` | Cancel own pending leave requests | `Dean Academic`, `acadadmin`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff`, `student` |
 | `leave.request.view` | View leave requests for managed employees | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 | `leave.request.review` | Approve or reject leave requests | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+| `leave.configuration.manage` | Configure leave policy and balances | `acadadmin` |
 
 ## `placement_cell`
 

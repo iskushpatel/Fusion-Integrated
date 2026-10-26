@@ -8,7 +8,7 @@ class LeaveRuleError(ValueError):
 
 
 def requested_days(start: date, end: date) -> int:
-    """Count weekdays in an inclusive date range (public holidays are not modeled)."""
+    """Count whole weekdays inclusively; holidays and half-days are not modeled."""
     if end < start:
         raise LeaveRuleError("The end date must be on or after the start date.")
     return sum(1 for offset in range((end - start).days + 1)
